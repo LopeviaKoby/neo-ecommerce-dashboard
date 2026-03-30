@@ -1,0 +1,24 @@
+# VCS & local tools
+.git/
+.gitignore
+.claude/
+.playwright-mcp/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.env
+
+# IDE
+.vscode/
+.idea/
+
+# Docs & screenshots (not needed at runtime)
+*.pdf
+*.md
+1.png
+2.png
+3.png
+5.png
