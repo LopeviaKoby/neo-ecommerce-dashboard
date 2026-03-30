@@ -23,6 +23,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ── DEBUG: remove after confirming secrets work ──
+st.caption(f"Secrets keys: {list(st.secrets.keys())}")
+
 # ── Data ──
 with st.spinner("Cargando metricas de negocio..."):
     data = load_all()
