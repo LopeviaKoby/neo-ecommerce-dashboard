@@ -8,10 +8,17 @@ PROJECT_ID = "bussiness-case-tyc"
 DATASET = "business_case_lopez_chavarria"
 
 # ── Create API client (official Streamlit pattern) ──
-# Ref: https://docs.streamlit.io/develop/tutorials/databases/bigquery
+# Supports both nested [gcp_service_account] and flat secrets formats
 if "gcp_service_account" in st.secrets:
+    _creds_info = st.secrets["gcp_service_account"]
+elif "type" in st.secrets and st.secrets["type"] == "service_account":
+    _creds_info = st.secrets
+else:
+    _creds_info = None
+
+if _creds_info is not None:
     credentials = service_account.Credentials.from_service_account_info(
-        st.secrets["gcp_service_account"]
+        dict(_creds_info)
     )
     _client = bigquery.Client(project=PROJECT_ID, credentials=credentials)
 else:
