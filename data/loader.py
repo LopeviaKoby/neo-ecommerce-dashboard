@@ -11,12 +11,12 @@ DATASET = "business_case_lopez_chavarria"
 @st.cache_resource
 def _get_client() -> bigquery.Client:
     """BigQuery client (cached singleton): uses st.secrets on Streamlit Cloud, ADC elsewhere."""
-    try:
-        creds_info = dict(st.secrets["gcp_service_account"])
-        credentials = service_account.Credentials.from_service_account_info(creds_info)
+    if "gcp_service_account" in st.secrets:
+        credentials = service_account.Credentials.from_service_account_info(
+            dict(st.secrets["gcp_service_account"])
+        )
         return bigquery.Client(project=PROJECT_ID, credentials=credentials)
-    except (KeyError, FileNotFoundError):
-        return bigquery.Client(project=PROJECT_ID)
+    return bigquery.Client(project=PROJECT_ID)
 
 
 @st.cache_data(ttl=3600)
