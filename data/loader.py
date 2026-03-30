@@ -1,31 +1,29 @@
 import streamlit as st
 import pandas as pd
-from google.cloud import bigquery
 from google.oauth2 import service_account
+from google.cloud import bigquery
 
 # ── BigQuery settings (UNTOUCHED) ──
 PROJECT_ID = "bussiness-case-tyc"
 DATASET = "business_case_lopez_chavarria"
 
-
-@st.cache_resource
-def _get_client() -> bigquery.Client:
-    """BigQuery client (cached singleton): uses st.secrets on Streamlit Cloud, ADC elsewhere."""
-    if "gcp_service_account" in st.secrets:
-        credentials = service_account.Credentials.from_service_account_info(
-            dict(st.secrets["gcp_service_account"])
-        )
-        return bigquery.Client(project=PROJECT_ID, credentials=credentials)
-    return bigquery.Client(project=PROJECT_ID)
+# ── Create API client (official Streamlit pattern) ──
+# Ref: https://docs.streamlit.io/develop/tutorials/databases/bigquery
+if "gcp_service_account" in st.secrets:
+    credentials = service_account.Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"]
+    )
+    _client = bigquery.Client(project=PROJECT_ID, credentials=credentials)
+else:
+    _client = bigquery.Client(project=PROJECT_ID)
 
 
 @st.cache_data(ttl=3600)
 def load_data(view_name: str) -> pd.DataFrame:
     """Carga los datos directamente desde las vistas de BigQuery."""
-    client = _get_client()
     query = f"SELECT * FROM `{PROJECT_ID}.{DATASET}.{view_name}`"
     try:
-        return client.query(query).to_dataframe()
+        return _client.query(query).to_dataframe()
     except Exception as e:
         st.error(f"Error al cargar {view_name}: {e}")
         return pd.DataFrame()
