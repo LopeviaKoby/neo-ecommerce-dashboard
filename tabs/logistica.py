@@ -71,6 +71,14 @@ def _render_map(df_log: pd.DataFrame) -> None:
         unsafe_allow_html=True,
     )
 
+    if "latitud" not in df_log.columns or "longitud" not in df_log.columns:
+        st.warning(
+            "La vista `vw_tiempos_logistica` no expone las columnas `latitud`/`longitud`. "
+            "Asegurate de incluir `dc.latitude AS latitud, dc.longitude AS longitud` "
+            "en el SELECT final del JOIN con `distribution_centers`."
+        )
+        return
+
     df_map = df_log.dropna(subset=["latitud", "longitud"]).copy()
     if df_map.empty:
         st.info("No hay coordenadas disponibles para el filtro seleccionado.")
